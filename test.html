@@ -1,0 +1,74 @@
+<html>
+
+<head>
+    <style>
+    body {
+        margin: 0px;
+        padding: 0px;
+    }
+    </style>
+    <script src="canvas-cropper.js"></script>
+</head>
+
+<body>
+    <canvas id="myCanvas" width="578" height="400"></canvas>
+    <br>
+    <button id="toggleEnabledButton">Toggled Enabled</button>
+    <button id="resetButton">Reset</button>
+    <button id="croppedImageButton">GetCroppedImage</button>
+    <div id="enabledStatusDiv" style="font-size: 3em;">Enabled</div>
+    <script>
+    var canvas = document.getElementById('myCanvas');
+    var context = canvas.getContext('2d');
+
+    var imageObj = new Image();
+    imageObj.onload = function() {
+        context.drawImage(imageObj, 69, 50);
+    };
+    imageObj.src = 'blocks.jpg';
+
+    var openImageInNewWindow = function(dataUri) {
+        var newWindow = window.open()
+        newWindow.document.write('<img src="' + dataUri + '"></img>');
+    };
+
+    CANVAS = new CanvasCropper(canvas)
+        .capture(function(dataUri, canvasData) {
+            openImageInNewWindow(dataUri);
+            updateCanvasCropperStatus();
+        });
+
+    var toggleCanvasCropperEnabled = function() {
+        if (CANVAS.isEnabled())
+            CANVAS.disable();
+        else
+            CANVAS.enable(false);
+
+        updateCanvasCropperStatus();
+    };
+
+    var updateCanvasCropperStatus = function() {
+        var enabledStatus = CANVAS.isEnabled() ? "Enabled" : "Disabled";
+        document.getElementById('enabledStatusDiv').innerHTML = enabledStatus;
+        console.log(CANVAS.isEnabled())
+    };
+
+    var resetCanvas = function() {
+        CANVAS.reset();
+    };
+
+    var getCanvasCroppedImage = function() {
+        openImageInNewWindow(CANVAS.getCroppedImage());
+    };
+
+    var toggleEnabledButton = document.getElementById('toggleEnabledButton');
+    toggleEnabledButton.addEventListener("click", toggleCanvasCropperEnabled);
+    var resetButton = document.getElementById('resetButton');
+    resetButton.addEventListener("click", resetCanvas);
+    var croppedImageButton = document.getElementById('croppedImageButton');
+    croppedImageButton.addEventListener("click", getCanvasCroppedImage);
+    </script>
+
+</body>
+
+</html>
