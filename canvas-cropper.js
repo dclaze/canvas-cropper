@@ -1,4 +1,4 @@
-CanvasCropper = function(canvas) {
+function CanvasCropper(canvas) {
     if (!this.isSupported())
         throw "CanvasCropper not supported for this browser";
     this._canvas = canvas;
