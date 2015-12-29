@@ -8,6 +8,7 @@ function CanvasCropper(canvas) {
     this._enabled = false;
     this._dragging = false;
     this._cropRectangle = {};
+    this._shadowOverlay = {};
 };
 
 CanvasCropper.prototype.capture = function(callback) {
@@ -40,6 +41,7 @@ CanvasCropper.prototype.disable = function() {
 CanvasCropper.prototype.reset = function() {
     this._dragging = false;
     this._cropRectangle = {};
+    this._shadowOverlay = {};
     this._overlay.style.height = 0;
     this._overlay.style.width = 0;
     this._callback = undefined;
@@ -83,15 +85,19 @@ CanvasCropper.prototype._removeListeners = function() {
 
 CanvasCropper.prototype._onMouseDown = function(e) {
     this._dragging = true;
-    var point = QuirksMode.getPoint(e);
-    this._setCropRectangleStartPoint(point.x, point.y);
+    var point = QuirksMode.getAbsolutePoint(e),
+        canvasOffset = QuirksMode.getElementOffsetPoint(this._canvas);
+    this._setShadowOverlayStartPoint(point.x, point.y);
+    this._setCropRectangleStartPoint(point.x - canvasOffset.x, point.y - canvasOffset.y);
 };
 
 CanvasCropper.prototype._onMouseMove = function(e) {
     if (this._dragging && this._enabled) {
-        var point = QuirksMode.getPoint(e);
-        this._updateCropRectangleEndPoint(point.x, point.y);
-        this._drawRectangle();
+        var point = QuirksMode.getAbsolutePoint(e),
+            canvasOffset = QuirksMode.getElementOffsetPoint(this._canvas);
+        this._updateShadowOverlayEndPoint(point.x, point.y);
+        this._updateCropRectangleEndPoint(point.x - canvasOffset.x, point.y - canvasOffset.y);
+        this._dragOverlay();
     }
 
     e.preventDefault();
@@ -121,11 +127,11 @@ CanvasCropper.prototype._restoreCanvas = function() {
     this._canvas.style.cursor = this.previousCursor || "";
 };
 
-CanvasCropper.prototype._drawRectangle = function(e) {
-    this._overlay.style.width = this._cropRectangle.width + 'px';
-    this._overlay.style.height = this._cropRectangle.height + 'px';
-    this._overlay.style.left = this._cropRectangle.left + 'px';
-    this._overlay.style.top = this._cropRectangle.top + 'px';
+CanvasCropper.prototype._dragOverlay = function() {
+    this._overlay.style.width = this._shadowOverlay.width + 'px';
+    this._overlay.style.height = this._shadowOverlay.height + 'px';
+    this._overlay.style.left = this._shadowOverlay.left + 'px';
+    this._overlay.style.top = this._shadowOverlay.top + 'px';
 };
 
 CanvasCropper.prototype._getImageAsUrl = function() {
@@ -149,6 +155,11 @@ CanvasCropper.prototype._setCropRectangleStartPoint = function(x1, y1) {
     this._cropRectangle.y1 = y1;
 };
 
+CanvasCropper.prototype._setShadowOverlayStartPoint = function(x1, y1) {
+    this._shadowOverlay.x1 = x1;
+    this._shadowOverlay.y1 = y1;
+};
+
 CanvasCropper.prototype._updateCropRectangleEndPoint = function(x2, y2) {
     this._cropRectangle.x2 = x2 - this._cropRectangle.x1;
     this._cropRectangle.y2 = y2 - this._cropRectangle.y1;
@@ -158,8 +169,17 @@ CanvasCropper.prototype._updateCropRectangleEndPoint = function(x2, y2) {
     this._cropRectangle.top = (y2 - this._cropRectangle.y1 < 0) ? y2 : this._cropRectangle.y1;
 };
 
+CanvasCropper.prototype._updateShadowOverlayEndPoint = function(x2, y2) {
+    this._shadowOverlay.x2 = x2 - this._shadowOverlay.x1;
+    this._shadowOverlay.y2 = y2 - this._shadowOverlay.y1;
+    this._shadowOverlay.width = Math.abs(x2 - this._shadowOverlay.x1);
+    this._shadowOverlay.height = Math.abs(y2 - this._shadowOverlay.y1);
+    this._shadowOverlay.left = (x2 - this._shadowOverlay.x1 < 0) ? x2 : this._shadowOverlay.x1;
+    this._shadowOverlay.top = (y2 - this._shadowOverlay.y1 < 0) ? y2 : this._shadowOverlay.y1;
+};
+
 QuirksMode = {
-    getPoint: function(e, element) {
+    getAbsolutePoint: function(e, element) {
         var x = 0;
         var y = 0;
         if (!e) var e = window.event;
@@ -170,10 +190,15 @@ QuirksMode = {
             x = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
             y = e.clientY + document.body.scrollTop + document.documentElement.scrollTop;
         }
-
         return {
             x: x,
             y: y
         };
-    }
+    },
+    getElementOffsetPoint: function(element) {
+        return {
+            x: element.offsetLeft,
+            y: element.offsetTop
+        };
+    },
 };
