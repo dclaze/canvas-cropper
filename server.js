@@ -3,4 +3,8 @@ var app = express();
 
 app.use(express.static(__dirname));
 
-app.listen(34342);
+var port = 34342;
+
+app.listen(port);
+
+console.log("Started sever on port", port);

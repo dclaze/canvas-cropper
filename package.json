@@ -1,0 +1,23 @@
+{
+  "name": "canvas-cropper",
+  "version": "1.0.0",
+  "description": "html canvas image cropper",
+  "main": "canvas-cropper.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dclaze/canvas-cropper.git"
+  },
+  "author": "doug colaizzo",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dclaze/canvas-cropper/issues"
+  },
+  "homepage": "https://github.com/dclaze/canvas-cropper#readme",
+  "devDependencies": {
+    "express": "^4.13.3"
+  }
+}
