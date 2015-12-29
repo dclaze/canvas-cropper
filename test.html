@@ -34,10 +34,7 @@
     };
 
     CANVAS = new CanvasCropper(canvas)
-        .capture(function(dataUri, canvasData) {
-            openImageInNewWindow(dataUri);
-            updateCanvasCropperStatus();
-        });
+        .capture();
 
     var toggleCanvasCropperEnabled = function() {
         if (CANVAS.isEnabled())
@@ -69,7 +66,6 @@
     var croppedImageButton = document.getElementById('croppedImageButton');
     croppedImageButton.addEventListener("click", getCanvasCroppedImage);
     </script>
-
 </body>
 
 </html>
